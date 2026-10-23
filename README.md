@@ -20,7 +20,11 @@ cd dsh-toolkit
 ./scripts/install-session-autotitle.sh /absolute/path/to/your/repo
 ```
 
-Restart DSH after the first install; later changes reload with the profile.
+Restart DSH after installing or changing the profile patch; a running profile does
+not pick up a new plugin entry. If the title does not change, check that
+`cordis.patch.yml` contains an `insert:` block (a bare `- id:` is skipped by the
+loader) and that the claim command exited 0. Details in the
+[session-autotitle README](plugins/session-autotitle/README.md#verify-the-install).
 
 ## Design notes
 

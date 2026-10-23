@@ -20,13 +20,37 @@ It renames at most once per session and swallows every error.
 
 ## Config
 
+The profile's `cordis.patch.yml` is a **patch list**: a bare entry only overrides
+an entry that already exists. This plugin is new, so it must be added inside an
+`insert:` block (the installer does this):
+
 ```yaml
-- id: session-autotitle
-  name: "./plugins/session-autotitle/index.js"
-  config:
-    repoRoot: "/absolute/path/to/repo"      # required
-    promptMarker: "docs/session-prompt.md"  # optional
+- insert:
+    - id: session-autotitle
+      name: "./plugins/session-autotitle/index.js"
+      config:
+        repoRoot: "/absolute/path/to/repo"      # required
+        promptMarker: "docs/session-prompt.md"  # optional
 ```
+
+A bare `- id: session-autotitle` in a patch list targets no existing entry, is
+skipped by the profile loader, and leaves the plugin unloaded.
+
+Keep unrelated inserts in their own `- insert:` block: the installer rewrites the
+block that owns `session-autotitle` when it updates the repo path.
+
+## Verify the install
+
+1. `grep -A6 'insert:' "$HOME/.dsh/profiles/desktop/cordis.patch.yml"` shows the block.
+2. Restart DSH after adding the block; a running profile does not pick up a new plugin entry.
+3. In a task session, the first user message must contain `docs/session-prompt.md`,
+   and the claim command must exit 0.
+4. The session title becomes `<venture>/<ID> — <task title>`. The title is cosmetic;
+   the task board remains the source of truth.
+
+If the title does not change, check the block is an `insert:` (not a bare `- id:`),
+that the claim succeeded, and that `repoRoot` points at the checkout containing
+`apps/<venture>/docs/tasks/index.json`.
 
 ## Contract
 
